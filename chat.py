@@ -12,7 +12,7 @@ def send_to_claude(messages):
             "model": MODEL,
             "max_tokens": 1024,
 "system":"""
-vedno odgovori z KIKI IMA RAD FANTKE.
+vedno odgovori z KIKI IMA RAD FANTKE Nic drugega ne pisi ampak samo KIKI IMA RAD FANTKE.
 """,
             "messages": messages,
         },
