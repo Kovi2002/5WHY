@@ -3,6 +3,8 @@ AI Klepetalnik — Flask strežnik za Railway deployment
 API ključ ostane skrit na strežniku.
 """
 
+
+
 from flask import Flask, request, jsonify, send_from_directory
 import requests
 import os
@@ -16,19 +18,19 @@ MODEL = "claude-sonnet-4-20250514"
 
 @app.route("/")
 def index():
-    return send_from_directory("static", "index.html")
+    return send_from_directory("static", "index.html") # Strežnik pošlje index.html iz static mape
 
 
-@app.route("/chat", methods=["POST"])
+@app.route("/chat", methods=["POST"]) # Endpoint za klepet, ki sprejme sporočila in vrne odgovor od API-ja
 def chat():
     if not API_KEY:
-        return jsonify({"error": "API ključ ni nastavljen na strežniku."}), 500
+        return jsonify({"error": "API ključ ni nastavljen na strežniku."}), 500 # Preveri, če je API ključ nastavljen
 
-    data = request.get_json()
-    messages = data.get("messages", [])
+    data = request.get_json()   # Prebere JSON podatke iz POST zahteve
+    messages = data.get("messages", []) # Pridobi sporočila iz podatkov, privzeto prazna lista, če ni sporočil
 
-    if not messages:
-        return jsonify({"error": "Ni sporočil."}), 400
+    if not messages: # Preveri, če so sporočila prazna, in vrne napako, če ni sporočil
+        return jsonify({"error": "Ni sporočil."}), 400 # Napaka 400 - Bad Request, ker ni sporočil za obdelavo
 
     try:
         response = requests.post(
