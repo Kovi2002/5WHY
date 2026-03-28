@@ -1,21 +1,26 @@
 import os
+import json
+import reportlab
+from io import BytesIO
 from flask import Flask, request, jsonify, send_from_directory, make_response
 from chat import send_to_claude
 from pdf_handler import encode_pdf, build_message_with_pdf
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 from reportlab.lib.units import cm
-from io import BytesIO
-import json
-from history import save_message
-
-app = Flask(__name__, static_folder="static")
-
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from history import save_message, init_db
 
+# Registracija fontov z podporo za šumnike (dinamična pot, deluje v vseh okoljih)
+_font_dir = os.path.join(os.path.dirname(reportlab.__file__), "fonts")
+pdfmetrics.registerFont(TTFont("Vera", os.path.join(_font_dir, "Vera.ttf")))
+pdfmetrics.registerFont(TTFont("VeraBd", os.path.join(_font_dir, "VeraBd.ttf")))
+
 app = Flask(__name__, static_folder="static")
-init_db()  # ustvari tabelo ob zagonu
+init_db()
 
 @app.route("/")
 def index():
@@ -57,30 +62,56 @@ def chat():
 @app.route("/export-pdf", methods=["POST"])
 def export_pdf():
     data = request.get_json()
-    messages = data.get("messages", [])
+    diagram = data.get("diagram", {})
+    problem = diagram.get("problem", "")
+    whys = diagram.get("whys", [])
+    rootcause = diagram.get("rootcause", "")
 
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4,
                             rightMargin=2*cm, leftMargin=2*cm,
                             topMargin=2*cm, bottomMargin=2*cm)
 
-    styles = getSampleStyleSheet()
-    title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=16, spaceAfter=20)
-    user_style = ParagraphStyle('User', parent=styles['Normal'], fontSize=10,
-                                spaceAfter=6, fontName='Helvetica-Bold')
-    ai_style = ParagraphStyle('AI', parent=styles['Normal'], fontSize=10, spaceAfter=12)
+    title_style = ParagraphStyle('Title',
+                                 fontName='VeraBd', fontSize=18, spaceAfter=6,
+                                 textColor=colors.HexColor("#1a1a1a"))
+    subtitle_style = ParagraphStyle('Subtitle',
+                                    fontName='Vera', fontSize=10, spaceAfter=20,
+                                    textColor=colors.HexColor("#888888"))
+    label_style = ParagraphStyle('Label',
+                                 fontName='VeraBd', fontSize=9, spaceAfter=2,
+                                 textColor=colors.HexColor("#888888"))
+    value_style = ParagraphStyle('Value',
+                                 fontName='Vera', fontSize=11, spaceAfter=14,
+                                 textColor=colors.HexColor("#1a1a1a"))
+    rootcause_style = ParagraphStyle('RootCause',
+                                     fontName='VeraBd', fontSize=11, spaceAfter=6,
+                                     textColor=colors.white, backColor=colors.HexColor("#c0392b"),
+                                     leftIndent=8, rightIndent=8, leading=16)
 
     story = []
-    story.append(Paragraph("5WHY Analiza — Poročilo", title_style))
+    story.append(Paragraph("5WHY Analiza", title_style))
+    story.append(Paragraph("Poročilo o analizi temeljnih vzrokov", subtitle_style))
+    story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#e0e0db")))
     story.append(Spacer(1, 0.5*cm))
 
-    for msg in messages:
-        if msg["role"] == "user":
-            story.append(Paragraph("Vi:", user_style))
-        else:
-            story.append(Paragraph("AI:", user_style))
-        story.append(Paragraph(msg["content"].replace('\n', '<br/>'), ai_style))
+    if problem:
+        story.append(Paragraph("PROBLEM", label_style))
+        story.append(Paragraph(problem, value_style))
+        story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#e0e0db")))
         story.append(Spacer(1, 0.3*cm))
+
+    for i, why in enumerate(whys):
+        if why:
+            story.append(Paragraph(f"WHY {i + 1}", label_style))
+            story.append(Paragraph(why, value_style))
+
+    if rootcause:
+        story.append(Spacer(1, 0.3*cm))
+        story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#e0e0db")))
+        story.append(Spacer(1, 0.3*cm))
+        story.append(Paragraph("TEMELJNI VZROK (ROOT CAUSE)", label_style))
+        story.append(Paragraph(rootcause, rootcause_style))
 
     doc.build(story)
     buffer.seek(0)
