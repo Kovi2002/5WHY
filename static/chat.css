@@ -39,12 +39,6 @@
   letter-spacing: 0.02em;
 }
 
-.header-text p {
-  font-size: 13px;
-  color: var(--text-dim);
-  margin-top: 1px;
-}
-
 /* Status dot */
 .header-text h1::after {
   content: '';

@@ -12,15 +12,12 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from history import save_message, init_db
-
 # Registracija fontov z podporo za šumnike (dinamična pot, deluje v vseh okoljih)
 _font_dir = os.path.join(os.path.dirname(reportlab.__file__), "fonts")
 pdfmetrics.registerFont(TTFont("Vera", os.path.join(_font_dir, "Vera.ttf")))
 pdfmetrics.registerFont(TTFont("VeraBd", os.path.join(_font_dir, "VeraBd.ttf")))
 
 app = Flask(__name__, static_folder="static")
-init_db()
 
 @app.route("/")
 def index():
@@ -48,14 +45,7 @@ def chat():
     if response.status_code != 200:
         return jsonify({"error": f"API napaka: {response.text}"}), response.status_code
 
-
-
-
     reply = response.json()["content"][0]["text"]
-
-    session_id = request.headers.get("X-Session-ID", "unknown")
-    save_message(session_id, "user", messages[-1]["content"] if isinstance(messages[-1]["content"], str) else "PDF sporočilo")
-    save_message(session_id, "assistant", reply)
 
     return jsonify({"reply": reply})
 

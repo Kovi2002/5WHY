@@ -38,7 +38,7 @@ function addMessage(role, text) {
 
   const label = document.createElement("div");
   label.className = "message-label";
-  label.textContent = role === "user" ? "Vi" : role === "error" ? "Napaka" : "LUKA";
+  label.textContent = role === "user" ? "Vi" : role === "error" ? "Napaka" : "Asistent";
 
   const bubble = document.createElement("div");
   bubble.className = "message-bubble";

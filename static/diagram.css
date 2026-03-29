@@ -1,6 +1,6 @@
 /* DIAGRAM PANEL */
 .diagram-panel {
-  width: 400px;
+  width: 520px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -9,7 +9,7 @@
 .diagram-header {
   padding: 1.1rem 1.5rem;
   border-bottom: 1px solid var(--border);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   font-family: 'JetBrains Mono', monospace;
   color: var(--neon);
@@ -18,15 +18,15 @@
   background: rgba(0,0,0,0.2);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .diagram-header::before {
   content: '';
-  width: 8px; height: 8px;
+  width: 10px; height: 10px;
   border-radius: 2px;
   background: var(--neon);
-  box-shadow: 0 0 8px var(--neon);
+  box-shadow: 0 0 10px var(--neon);
   flex-shrink: 0;
 }
 
@@ -37,14 +37,14 @@
   padding: 1.5rem 1rem 1.5rem 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.06) transparent;
 }
 
 .diagram-empty {
   color: var(--text-dim);
-  font-size: 14px;
+  font-size: 16px;
   font-family: 'JetBrains Mono', monospace;
   text-align: center;
   margin-top: 3rem;
@@ -56,14 +56,14 @@
   background: linear-gradient(135deg, rgba(255,77,109,0.85), rgba(255,77,109,0.65));
   border: 1px solid rgba(255,77,109,0.4);
   color: #fff;
-  padding: 8px 16px;
-  font-size: 13.5px;
+  padding: 12px 20px;
+  font-size: 16px;
   font-weight: 600;
   border-radius: 8px;
   align-self: flex-start;
   max-width: 90%;
   word-break: break-word;
-  box-shadow: 0 0 14px rgba(255,77,109,0.2);
+  box-shadow: 0 0 16px rgba(255,77,109,0.25);
   animation: fadeIn 0.35s ease;
 }
 
@@ -78,16 +78,16 @@
 .diagram-why {
   background: linear-gradient(135deg, #ff8c42, #f0a500);
   color: #000;
-  padding: 7px 20px 7px 11px;
-  font-size: 13px;
+  padding: 10px 26px 10px 14px;
+  font-size: 15px;
   font-weight: 700;
   font-family: 'JetBrains Mono', monospace;
   white-space: nowrap;
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%);
-  box-shadow: 4px 0 10px rgba(255,140,66,0.2);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%);
+  box-shadow: 4px 0 12px rgba(255,140,66,0.25);
 }
 
 /* Zelena puščica — odgovor */
@@ -96,13 +96,13 @@
   border: 1px solid rgba(0,229,160,0.25);
   border-left: none;
   color: #fff;
-  padding: 7px 20px 7px 14px;
-  font-size: 13px;
+  padding: 10px 26px 10px 18px;
+  font-size: 15px;
   display: flex;
   align-items: center;
   margin-left: -2px;
   word-break: break-word;
-  clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%);
 }
 
 /* Root cause */
@@ -110,13 +110,13 @@
   background: linear-gradient(135deg, rgba(255,77,109,0.85), rgba(255,77,109,0.65));
   border: 1px solid rgba(255,77,109,0.4);
   color: #fff;
-  padding: 8px 16px;
-  font-size: 13.5px;
+  padding: 12px 20px;
+  font-size: 16px;
   font-weight: 700;
   border-radius: 8px;
   align-self: flex-start;
   word-break: break-word;
   max-width: 90%;
-  box-shadow: 0 0 14px rgba(255,77,109,0.25);
+  box-shadow: 0 0 16px rgba(255,77,109,0.3);
   animation: fadeIn 0.35s ease;
 }

@@ -5,20 +5,18 @@ function parseAndUpdateDiagram(text) {
   for (const line of lines) {
     const clean = line.replace(/\*\*/g, "").trim();
     if (clean.startsWith("PROBLEM:")) {
-      // Nova analiza — resetiramo vse prejšnje podatke
       diagramData = { problem: null, whys: [], rootcause: null };
       diagramData.problem = clean.replace("PROBLEM:", "").trim();
       document.getElementById("export-btn").style.display = "none";
-    } else if (clean.match(/^WHY\d:/)) {
-      const num = clean.match(/^WHY(\d):/)[1];
-      const answer = clean.replace(/^WHY\d:/, "").trim();
-      diagramData.whys[parseInt(num) - 1] = answer;
+    } else if (/^WHY([1-9]|10):/.test(clean)) {
+      const num = parseInt(clean.match(/^WHY(\d+):/)[1]);
+      const answer = clean.replace(/^WHY\d+:/, "").trim();
+      diagramData.whys[num - 1] = answer;
     } else if (clean.startsWith("ROOT CAUSE:")) {
       diagramData.rootcause = clean.replace("ROOT CAUSE:", "").trim();
     }
   }
   renderDiagram();
-  // Gumb se prikaže šele ko je analiza zaključena (ROOT CAUSE najden)
   if (diagramData.rootcause) {
     document.getElementById("export-btn").style.display = "block";
   }
@@ -29,7 +27,7 @@ function renderDiagram() {
   if (!diagramData.problem && diagramData.whys.length === 0) return;
 
   content.innerHTML = "";
-  const STEP = 26;
+  const STEP = 32;
 
   if (diagramData.problem) {
     const node = document.createElement("div");
