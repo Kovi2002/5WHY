@@ -66,8 +66,8 @@ def export_pdf():
                                  fontName='VeraBd', fontSize=18, spaceAfter=6,
                                  textColor=colors.HexColor("#1a1a1a"))
     subtitle_style = ParagraphStyle('Subtitle',
-                                    fontName='Vera', fontSize=10, spaceAfter=20,
-                                    textColor=colors.HexColor("#888888"))
+                                fontName='Vera', fontSize=10, spaceAfter=20,
+                                textColor=colors.HexColor("#888888"))
     label_style = ParagraphStyle('Label',
                                  fontName='VeraBd', fontSize=9, spaceAfter=2,
                                  textColor=colors.HexColor("#888888"))
@@ -75,9 +75,9 @@ def export_pdf():
                                  fontName='Vera', fontSize=11, spaceAfter=14,
                                  textColor=colors.HexColor("#1a1a1a"))
     rootcause_style = ParagraphStyle('RootCause',
-                                     fontName='VeraBd', fontSize=11, spaceAfter=6,
-                                     textColor=colors.white, backColor=colors.HexColor("#c0392b"),
-                                     leftIndent=8, rightIndent=8, leading=16)
+                                 fontName='VeraBd', fontSize=11, spaceAfter=6,
+                                 textColor=colors.white, backColor=colors.HexColor("#c0392b"),
+                                 leftIndent=8, rightIndent=8, leading=16)
 
     story = []
     story.append(Paragraph("5WHY Analiza", title_style))
