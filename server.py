@@ -5,6 +5,7 @@ from io import BytesIO
 from flask import Flask, request, jsonify, send_from_directory, make_response
 from chat import send_to_claude
 from pdf_handler import encode_pdf, build_message_with_pdf
+from history import save_message, init_db  # ← DODAJ
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib import colors
@@ -12,12 +13,13 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-# Registracija fontov z podporo za šumnike (dinamična pot, deluje v vseh okoljih)
+
 _font_dir = os.path.join(os.path.dirname(reportlab.__file__), "fonts")
 pdfmetrics.registerFont(TTFont("Vera", os.path.join(_font_dir, "Vera.ttf")))
 pdfmetrics.registerFont(TTFont("VeraBd", os.path.join(_font_dir, "VeraBd.ttf")))
 
 app = Flask(__name__, static_folder="static")
+init_db()  # ← DODAJ
 
 @app.route("/")
 def index():
@@ -47,6 +49,17 @@ def chat():
 
     reply = response.json()["content"][0]["text"]
 
+    # ← DODAJ shranjevanje zgodovine
+    session_id = request.headers.get("X-Session-ID", "unknown")
+    if isinstance(messages[-1]["content"], str):
+        user_content = messages[-1]["content"]
+    else:
+        text_parts = [p["text"] for p in messages[-1]["content"] if p.get("type") == "text"]
+        user_content = " ".join(text_parts) if text_parts else "PDF sporočilo"
+
+    save_message(session_id, "user", user_content)
+    save_message(session_id, "assistant", reply)
+
     return jsonify({"reply": reply})
 
 @app.route("/export-pdf", methods=["POST"])
@@ -66,8 +79,8 @@ def export_pdf():
                                  fontName='VeraBd', fontSize=18, spaceAfter=6,
                                  textColor=colors.HexColor("#1a1a1a"))
     subtitle_style = ParagraphStyle('Subtitle',
-                                fontName='Vera', fontSize=10, spaceAfter=20,
-                                textColor=colors.HexColor("#888888"))
+                                    fontName='Vera', fontSize=10, spaceAfter=20,
+                                    textColor=colors.HexColor("#888888"))
     label_style = ParagraphStyle('Label',
                                  fontName='VeraBd', fontSize=9, spaceAfter=2,
                                  textColor=colors.HexColor("#888888"))
@@ -75,9 +88,9 @@ def export_pdf():
                                  fontName='Vera', fontSize=11, spaceAfter=14,
                                  textColor=colors.HexColor("#1a1a1a"))
     rootcause_style = ParagraphStyle('RootCause',
-                                 fontName='VeraBd', fontSize=11, spaceAfter=6,
-                                 textColor=colors.white, backColor=colors.HexColor("#c0392b"),
-                                 leftIndent=8, rightIndent=8, leading=16)
+                                     fontName='VeraBd', fontSize=11, spaceAfter=6,
+                                     textColor=colors.white, backColor=colors.HexColor("#c0392b"),
+                                     leftIndent=8, rightIndent=8, leading=16)
 
     story = []
     story.append(Paragraph("5WHY Analiza", title_style))
