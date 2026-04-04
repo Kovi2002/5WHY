@@ -5,7 +5,6 @@ from io import BytesIO
 from flask import Flask, request, jsonify, send_from_directory, make_response
 from chat import send_to_claude
 from pdf_handler import encode_pdf, build_message_with_pdf
-from history import save_message, init_db  # ← DODAJ
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib import colors
@@ -19,7 +18,6 @@ pdfmetrics.registerFont(TTFont("Vera", os.path.join(_font_dir, "Vera.ttf")))
 pdfmetrics.registerFont(TTFont("VeraBd", os.path.join(_font_dir, "VeraBd.ttf")))
 
 app = Flask(__name__, static_folder="static")
-init_db()  # ← DODAJ
 
 @app.route("/")
 def index():
@@ -48,17 +46,6 @@ def chat():
         return jsonify({"error": f"API napaka: {response.text}"}), response.status_code
 
     reply = response.json()["content"][0]["text"]
-
-    # ← DODAJ shranjevanje zgodovine
-    session_id = request.headers.get("X-Session-ID", "unknown")
-    if isinstance(messages[-1]["content"], str):
-        user_content = messages[-1]["content"]
-    else:
-        text_parts = [p["text"] for p in messages[-1]["content"] if p.get("type") == "text"]
-        user_content = " ".join(text_parts) if text_parts else "PDF sporočilo"
-
-    save_message(session_id, "user", user_content)
-    save_message(session_id, "assistant", reply)
 
     return jsonify({"reply": reply})
 
